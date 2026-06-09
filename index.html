@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MetAI Weekly Overview</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f5f2;--card:#fff;--border:rgba(0,0,0,0.09);--border-em:rgba(0,0,0,0.18);
+  --text:#1a1a18;--muted:#6b6b66;--hint:#9e9e99;
+  --info-bg:#e6f1fb;--info-t:#0c447c;--info-b:#b5d4f4;
+  --ok-bg:#eaf3de;--ok-t:#27500a;--ok-b:#c0dd97;
+  --warn-bg:#faeeda;--warn-t:#633806;--warn-b:#fac775;
+  --err-bg:#fcebeb;--err-t:#791f1f;--err-b:#f7c1c1;
+  --purple-bg:#eeedfe;--purple-t:#3c3489;--purple-b:#cecbf6;
+  --nav-w:200px;--r:10px;--r-sm:6px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1c1c1a;--card:#242422;--border:rgba(255,255,255,0.09);--border-em:rgba(255,255,255,0.2);
+    --text:#e8e8e2;--muted:#a0a09a;--hint:#555550;
+    --info-bg:#0c2a4a;--info-t:#b5d4f4;--info-b:#185fa5;
+    --ok-bg:#1a3308;--ok-t:#c0dd97;--ok-b:#3b6d11;
+    --warn-bg:#3d2200;--warn-t:#fac775;--warn-b:#854f0b;
+    --err-bg:#3d0f0f;--err-t:#f7c1c1;--err-b:#a32d2d;
+    --purple-bg:#1e1a4a;--purple-t:#cecbf6;--purple-b:#534ab7;
+  }
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+button{cursor:pointer;font-family:inherit;font-size:13px;border:0.5px solid var(--border-em);background:var(--card);color:var(--text);border-radius:var(--r-sm);padding:6px 12px;transition:background .15s}
+button:hover{background:var(--bg)}
+nav{width:var(--nav-w);min-height:100vh;background:var(--card);border-right:0.5px solid var(--border);padding:20px 0;display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.nav-logo{padding:0 16px 20px;font-size:16px;font-weight:500;color:var(--text);border-bottom:0.5px solid var(--border);margin-bottom:8px}
+.nav-logo span{font-size:11px;font-weight:400;color:var(--muted);display:block;margin-top:2px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:13px;color:var(--muted);cursor:pointer;transition:background .1s;border-left:2px solid transparent}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{color:var(--text);font-weight:500;border-left-color:var(--text);background:var(--bg)}
+.nav-item .ico{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+.nav-section{padding:16px 16px 4px;font-size:11px;color:var(--hint);letter-spacing:.06em}
+main{flex:1;padding:28px 32px;max-width:960px;overflow-x:hidden}
+.page{display:none}
+.page.active{display:block}
+.page-title{font-size:20px;font-weight:500;margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+.card{background:var(--card);border:0.5px solid var(--border);border-radius:var(--r);padding:16px 20px;margin-bottom:16px}
+.card-title{font-size:13px;font-weight:500;margin-bottom:12px}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.badge-ok{background:var(--ok-bg);color:var(--ok-t);border:0.5px solid var(--ok-b)}
+.badge-warn{background:var(--warn-bg);color:var(--warn-t);border:0.5px solid var(--warn-b)}
+.badge-err{background:var(--err-bg);color:var(--err-t);border:0.5px solid var(--err-b)}
+.badge-info{background:var(--info-bg);color:var(--info-t);border:0.5px solid var(--info-b)}
+.badge-purple{background:var(--purple-bg);color:var(--purple-t);border:0.5px solid var(--purple-b)}
+.badge-muted{background:var(--bg);color:var(--muted);border:0.5px solid var(--border)}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stat-card{background:var(--card);border:0.5px solid var(--border);border-radius:var(--r);padding:14px 16px}
+.stat-label{font-size:11px;color:var(--muted);margin-bottom:6px}
+.stat-val{font-size:24px;font-weight:600}
+.stat-val.ok{color:var(--ok-t)}
+.stat-val.warn{color:var(--warn-t)}
+.stat-val.err{color:var(--err-t)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.risk-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border)}
+.risk-item:last-child{border-bottom:none}
+.risk-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.risk-dot.high{background:#d63b3b}
+.risk-dot.mid{background:#e8882a}
+.risk-dot.low{background:#4a9e4a}
+.proj-table{width:100%;border-collapse:collapse}
+.proj-table th{text-align:left;font-size:11px;font-weight:500;color:var(--hint);padding:6px 8px;border-bottom:0.5px solid var(--border)}
+.proj-table td{padding:10px 8px;border-bottom:0.5px solid var(--border);vertical-align:middle;font-size:13px}
+.proj-table tr:last-child td{border-bottom:none}
+.prog-wrap{width:60px;height:5px;background:var(--border);border-radius:3px;overflow:hidden;display:inline-block}
+.prog-fill{height:100%;border-radius:3px}
+.prog-fill.ok{background:#4a9e4a}
+.prog-fill.warn{background:#e8882a}
+.prog-fill.err{background:#d63b3b}
+.ind-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.ind-ahead{background:var(--ok-bg);color:var(--ok-t)}
+.ind-on{background:var(--info-bg);color:var(--info-t)}
+.ind-behind{background:var(--err-bg);color:var(--err-t)}
+.member-tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;background:var(--err-bg);color:var(--err-t);border:0.5px solid var(--err-b);margin:3px}
+.emo-dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
+.week-bar{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.week-btn{padding:4px 12px;border-radius:20px;font-size:12px;cursor:pointer;background:var(--card);border:0.5px solid var(--border);color:var(--muted)}
+.week-btn.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+.search-row{display:flex;gap:8px;margin-bottom:16px}
+.search-row input,.search-row select{flex:1;padding:8px 12px;border:0.5px solid var(--border);border-radius:var(--r-sm);background:var(--card);color:var(--text);font-size:13px;font-family:inherit}
+.proj-card{background:var(--card);border:0.5px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+.proj-card-header{padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.proj-card-body{padding:0 16px 16px;display:none}
+.proj-card-body.open{display:block}
+.detail-row{display:flex;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.detail-row:last-child{border-bottom:none}
+.detail-label{color:var(--muted);min-width:80px;flex-shrink:0}
+.member-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.member-row:last-child{border-bottom:none}
+.tab-bar{display:flex;gap:4px;margin-bottom:16px;border-bottom:0.5px solid var(--border);padding-bottom:0}
+.tab-btn{padding:8px 14px;font-size:13px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-0.5px;background:none;border-radius:0;border-left:none;border-right:none;border-top:none}
+.tab-btn.active{color:var(--text);font-weight:500;border-bottom-color:var(--text)}
+.sug-card{background:var(--card);border:0.5px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px}
+.hc-chart-wrap{height:200px;position:relative;margin-bottom:16px}
+canvas{max-width:100%}
+.loading-overlay{position:fixed;top:16px;right:16px;background:var(--card);border:0.5px solid var(--border);border-radius:var(--r-sm);padding:8px 14px;font-size:12px;color:var(--muted);display:none;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.1)}
+.tfl-card{background:var(--card);border:0.5px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px}
+.override-sel{font-size:11px;padding:2px 6px;border:0.5px solid var(--border);border-radius:var(--r-sm);background:var(--card);color:var(--text);cursor:pointer}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">MetAI Weekly Overview</div>
+  <div class="nav-section">總覽</div>
+  <div class="nav-item active" onclick="showPage('overview')"><span class="ico">◆</span>首頁</div>
+  <div class="nav-item" onclick="showPage('suggestions')"><span class="ico">◎</span>本週建議</div>
+  <div class="nav-section">專案 & 人力</div>
+  <div class="nav-item" onclick="showPage('projects')"><span class="ico">▲</span>專案 / 產品</div>
+  <div class="nav-item" onclick="showPage('headcount')"><span class="ico">▣</span>人力分配</div>
+  <div class="nav-section">商業</div>
+  <div class="nav-item" onclick="showPage('bd')"><span class="ico">◆</span>BD 商機</div>
+  <div class="nav-section">資料</div>
+  <div class="nav-item" onclick="showPage('tfl')"><span class="ico">▣</span>TFL 週報</div>
+  <div class="nav-item" onclick="showPage('rawreports')"><span class="ico">▣</span>原始週報</div>
+</nav>
+
+<main>
+  <div class="loading-overlay" id="loading-overlay">載入即時資料...</div>
+
+  <!-- OVERVIEW -->
+  <div class="page active" id="page-overview">
+    <div class="page-title">本週總覽</div>
+    <div class="page-sub" id="ov-week-label">—</div>
+    <div class="card" style="margin-bottom:16px">
+      <div id="ov-ai-summary" style="font-size:13px;color:var(--muted);line-height:1.7">AI 分析中...</div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:0">專案 / 產品本週摘要</div>
+        <div style="font-size:11px;color:var(--hint)">指標由 AI 推斷，可手動覆蓋</div>
+      </div>
+      <table class="proj-table">
+        <thead><tr>
+          <th>專案</th><th>指標</th><th>本週摘要</th><th>覆蓋</th>
+        </tr></thead>
+        <tbody id="ov-proj-body"></tbody>
+      </table>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:0">專案時程 & 預計款項</div>
+        <div style="font-size:11px;color:var(--hint)">資料來自 Sheet: projects_timeline</div>
+      </div>
+      <table class="proj-table">
+        <thead><tr>
+          <th>專案</th><th>開始</th><th>預計結束</th><th>進度</th><th>預計款項</th><th>狀態</th>
+        </tr></thead>
+        <tbody id="ov-timeline-body"></tbody>
+      </table>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">△ 本週三大風險</div>
+        <div id="ov-risks"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">★ 本週三大亮點</div>
+        <div id="ov-highlights"></div>
+      </div>
+    </div>
+    <div class="card" id="ov-hr-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:0">招募 & 人力動態</div>
+        <span style="font-size:11px;color:var(--hint)">來自 HR 週報（Lynn Chen）</span>
+      </div>
+      <div id="ov-hr-content" style="font-size:13px;color:var(--muted);line-height:1.8">載入中...</div>
+    </div>
+    <div class="card">
+      <div class="card-title">本週繳交狀況</div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">已繳交</div><div class="stat-val ok" id="ov-submitted">—</div></div>
+        <div class="stat-card"><div class="stat-label">延遲繳交</div><div class="stat-val warn" id="ov-late">—</div></div>
+        <div class="stat-card"><div class="stat-label">未繳交</div><div class="stat-val err" id="ov-missing">—</div></div>
+        <div class="stat-card"><div class="stat-label">豁免 / 例外</div><div class="stat-val" id="ov-exempt">—</div></div>
+      </div>
+      <div style="margin-top:8px">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">未繳交：</div>
+        <div id="ov-missing-names"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:0">情緒 & 需關心成員（AI 推斷）</div>
+        <button onclick="toggleAllEmo()" id="ov-emo-toggle-btn" style="font-size:11px;padding:3px 10px;border-radius:20px">展開全部</button>
+      </div>
+      <div id="ov-emotion-alert"></div>
+      <div id="ov-emotion-all" style="display:none"></div>
+    </div>
+    
+  </div>
+
+  <!-- SUGGESTIONS -->
+  <div class="page" id="page-suggestions">
+    <div class="page-title">本週建議</div>
+    <div class="page-sub">AI 根據週報產生的行動建議</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <button onclick="setSugSort('priority')" id="sug-sort-priority">依優先級</button>
+      <button onclick="setSugSort('category')" id="sug-sort-category">依類別</button>
+    </div>
+    <div id="sug-list"></div>
+  </div>
+
+  <!-- PROJECTS -->
+  <div class="page" id="page-projects">
+    <div class="page-title">專案 / 產品</div>
+    <div class="page-sub">各專案詳細進度與成員工作</div>
+    <div id="proj-list"></div>
+  </div>
+
+  <!-- HEADCOUNT -->
+  <div class="page" id="page-headcount">
+    <div class="page-title">人力分配</div>
+    <div class="page-sub">各成員專案投入比例趨勢</div>
+    <div class="card" id="org-overview-card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:500">組織概覽</div>
+        <div id="org-total-count" style="font-size:12px;color:var(--muted)">—</div>
+      </div>
+      <div id="org-tree"></div>
+      <div id="org-mismatch" style="margin-top:12px"></div>
+    </div>
+    <div class="card" id="hc-ai-card" style="margin-bottom:16px">
+      <div style="font-size:12px;color:var(--hint);margin-bottom:6px">AI 人力分析</div>
+      <div id="hc-ai-text" style="font-size:13px;color:var(--muted);line-height:1.7">—</div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:500;margin-bottom:12px">人力趨勢（全體）</div>
+      <div style="height:200px;position:relative"><canvas id="hc-chart"></canvas></div>
+      <div id="hc-overload-info" style="margin-top:12px;font-size:12px"></div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:500;margin-bottom:12px">各成員本期分配</div>
+      <div id="hc-member-table"></div>
+    </div>
+    <div class="card" style="font-size:11px;color:var(--muted)">
+      資料來源：PM 人力分配 Sheet（自動同步）
+    </div>
+  </div>
+
+  <!-- BD -->
+  <div class="page" id="page-bd">
+    <div class="page-title">BD 商機</div>
+    <div class="page-sub">客戶開發進度追蹤</div>
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-size:12px;color:var(--hint);margin-bottom:6px">本週 BD 摘要</div>
+      <div id="bd-ai-text" style="font-size:13px;color:var(--muted);line-height:1.7">—</div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-btn active" id="bdtab-icp1" onclick="setBDTab('icp1')">ICP1 重點客戶</button>
+      <button class="tab-btn" id="bdtab-icp2" onclick="setBDTab('icp2')">ICP2 潛力客戶</button>
+      <button class="tab-btn" id="bdtab-other" onclick="setBDTab('other')">其他接洽</button>
+      <button class="tab-btn" id="bdtab-detected" onclick="setBDTab('detected')">週報偵測 <span id="bd-det-count" class="badge badge-info" style="margin-left:4px">0</span></button>
+    </div>
+    <div id="bd-icp1-panel"><div id="bd-icp1-list"></div></div>
+    <div id="bd-icp2-panel" style="display:none"><div id="bd-icp2-list"></div></div>
+    <div id="bd-other-panel" style="display:none"><div id="bd-other-list"></div></div>
+    <div id="bd-detected-panel" style="display:none"><div id="bd-detected-list"></div></div>
+  </div>
+
+  <!-- TFL -->
+  <div class="page" id="page-tfl">
+    <div class="page-title">TFL 週報彙整</div>
+    <div class="page-sub">Tech Function Lead 各功能本週進度</div>
+    <div id="tfl-summary-text" class="card" style="margin-bottom:16px;font-size:13px;color:var(--muted);line-height:1.7">載入中...</div>
+    <div id="tfl-list"></div>
+  </div>
+
+  <!-- RAW REPORTS -->
+  <div class="page" id="page-rawreports">
+    <div class="page-title">原始週報查閱</div>
+    <div class="page-sub">展開各成員原始週報全文</div>
+    <div class="week-bar" id="raw-week-bar"></div>
+    <div class="search-row">
+      <input type="text" id="raw-search" placeholder="搜尋人名、關鍵字..." oninput="filterRaw()">
+      <select id="raw-proj-filter" onchange="filterRaw()">
+        <option value="">所有專案</option>
+      </select>
+    </div>
+    <div id="raw-list"></div>
+  </div>
+</main>
+
+<script>
+// =====================================================
+// LIVE DATA CONFIG
+// =====================================================
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwYH2iIKCfdblLCxbuRwn2AlY1A6MdhmQHJKcPKQx-gdoGwa196rcAPxMB7LPXojXET2Q/exec';
+var USE_LIVE_DATA = true;
+
+function fetchData() {
+  if (window.__INJECTED__) return Promise.resolve(window.__INJECTED__);
+  var url = SCRIPT_URL + '?action=all';
+  return fetch(url)
+    .then(function(res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    })
+    .catch(function(e) {
+      console.warn('fetch failed:', e.message);
+      return null;
+    });
+}
+
+function loadLiveData() {
+  if (!USE_LIVE_DATA) return Promise.resolve(false);
+  showLoading(true);
+  return fetchData().then(function(d) {
+    showLoading(false);
+    if (!d) return false;
+    if (d.overview) {
+      W.overview       = d.overview;
+      W.weekLabel      = d.overview.weekLabel      || W.weekLabel;
+      W.submitted      = (d.overview.submitted !== undefined && d.overview.submitted !== null) ? d.overview.submitted : W.submitted;
+      W.late           = (d.overview.late !== undefined && d.overview.late !== null) ? d.overview.late : W.late;
+      W.missing        = (d.overview.missing !== undefined && d.overview.missing !== null) ? d.overview.missing : W.missing;
+      W.exempt         = (d.overview.exempt !== undefined && d.overview.exempt !== null) ? d.overview.exempt : W.exempt;
+      W.aiSummary      = d.overview.aiSummary      || W.aiSummary;
+      W.risks          = (d.overview.risks && d.overview.risks.length) ? d.overview.risks : W.risks;
+      W.highlights     = (d.overview.highlights && d.overview.highlights.length) ? d.overview.highlights : W.highlights;
+      W.missingMembers = d.overview.missingMembers || W.missingMembers;
+      W.emotion        = (d.overview.emotion && d.overview.emotion.length) ? d.overview.emotion : W.emotion;
+      if (d.overview.projects && d.overview.projects.length) {
+        d.overview.projects.forEach(function(lp) {
+          var p = W.projects.find(function(x) { return x.id === lp.id; });
+          if (p) {
+            if (lp.indicator) p.ind = lp.indicator;
+            if (lp.summary)   p.summary = lp.summary;
+            if (lp.progress)  p.prog = Number(lp.progress) || p.prog;
+          } else {
+            // 新專案：W.projects 沒有，動態 push 一筆
+            W.projects.push({
+              id: lp.id,
+              name: lp.name || lp.id,
+              type: lp.type || 'project',
+              period: '',
+              start: '', end: '',
+              prog: Number(lp.progress) || 0,
+              ind: lp.indicator || 'on',
+              indO: null,
+              summary: lp.summary || '',
+              detail: lp.detail || '',
+              payment: '',
+              payNote: '',
+              members: [],
+              risks: [],
+              rawLinks: []
+            });
+          }
+        });
+      }
+      // 把 projects_timeline 的款項與時程合併進 W.projects，覆蓋寫死的 fallback
+      // 若 W.projects 還沒有該專案（新增的），動態 push 一筆
+      if (d.overview.timeline && d.overview.timeline.length) {
+        d.overview.timeline.forEach(function(tl) {
+          var p = W.projects.find(function(x) { return x.id === tl.id; });
+          if (!p) {
+            // 新專案：從 timeline 建立完整的 projects 條目
+            p = {
+              id: tl.id,
+              name: tl.name || tl.id,
+              type: tl.type || 'project',
+              period: '',
+              start: '', end: '',
+              prog: Number(tl.progress) || 0,
+              ind: 'on',
+              indO: null,
+              summary: '',
+              detail: '',
+              payment: '',
+              payNote: '',
+              members: [],
+              risks: [],
+              rawLinks: []
+            };
+            W.projects.push(p);
+          }
+          if (tl.name)     p.name = tl.name;
+          if (tl.type)     p.type = tl.type;
+          if (tl.start || tl.end) {
+            p.period = fmtDate(tl.start) + ' ~ ' + fmtDate(tl.end);
+            p.start = fmtDate(tl.start);
+            p.end = tl.end ? fmtDate(tl.end) : null;
+          }
+          if (tl.progress !== undefined && tl.progress !== '') {
+            p.prog = Number(tl.progress) || p.prog;
+          }
+          if (tl.payment !== undefined && tl.payment !== '') {
+            var pay = tl.payment;
+            if (typeof pay === 'number' || /^\d+$/.test(String(pay))) {
+              p.payment = 'NT$ ' + String(pay).replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
+            } else {
+              p.payment = String(pay);
+            }
+          }
+          if (tl.payNote !== undefined) p.payNote = String(tl.payNote || '');
+          if (tl.status)   p.status = String(tl.status);
+        });
+
+        // 過濾：W.projects 只保留出現在 timeline 中的專案（去掉寫死但 sheet 已不存在的）
+        var validIds = {};
+        d.overview.timeline.forEach(function(tl) { validIds[tl.id] = true; });
+        W.projects = W.projects.filter(function(p) { return validIds[p.id]; });
+      }
+    }
+    if (d.projects && d.projects.length) {
+      d.projects.forEach(function(lp) {
+        var p = W.projects.find(function(x) { return x.id === lp.id; });
+        if (!p) {
+          // 罕見情況：projects 有但 timeline 沒有
+          p = {
+            id: lp.id, name: lp.name || lp.id, type: lp.type || 'project',
+            period: '', start: '', end: '',
+            prog: Number(lp.progress) || 0, ind: lp.indicator || 'on', indO: null,
+            summary: lp.summary || '', detail: lp.detail || '',
+            payment: '', payNote: '', members: [], risks: [], rawLinks: []
+          };
+          W.projects.push(p);
+        }
+        if (lp.detail)   p.detail  = lp.detail;
+        if (lp.summary)  p.summary = lp.summary;
+        if (lp.members && lp.members.length) p.members = lp.members;
+        if (lp.risks && lp.risks.length) p.risks = lp.risks;
+      });
+    }
+    if (d.headcount && d.headcount.source !== 'empty') {
+      var hc = d.headcount;
+      HC.source          = hc.source;
+      HC.weeks           = hc.weeks    || HC.months;
+      HC.months          = hc.weeks    || HC.months;
+      HC.projects        = hc.projects || HC.projects;
+      HC.colors          = hc.colors   || HC.colors;
+      HC.projData        = hc.projData || {};
+      HC.changes         = hc.changes  || HC.changes;
+      HC.overloadMembers = hc.overloadMembers || [];
+      HC.idleMembers     = hc.idleMembers     || [];
+      HC.members         = (hc.members && hc.members.length) ? hc.members : HC.members;
+    }
+    if (d.bd) {
+      BD.ai       = d.bd.ai       || BD.ai;
+      BD.icp1     = (d.bd.icp1 && d.bd.icp1.length)     ? d.bd.icp1     : BD.icp1;
+      BD.icp2     = (d.bd.icp2 && d.bd.icp2.length)     ? d.bd.icp2     : BD.icp2;
+      BD.other    = (d.bd.other && d.bd.other.length)    ? d.bd.other    : BD.other;
+      BD.detected = (d.bd.detected && d.bd.detected.length) ? d.bd.detected : BD.detected;
+    }
+    if (d.suggestions) {
+      SUGGESTIONS.summary = d.suggestions.summary || SUGGESTIONS.summary;
+      SUGGESTIONS.items   = (d.suggestions.items && d.suggestions.items.length) ? d.suggestions.items : SUGGESTIONS.items;
+    }
+    if (d.tfl && d.tfl.members && d.tfl.members.length) {
+      window._tflData = d.tfl;
+    }
+    if (d.rawReports && d.rawReports.length) {
+      // 用週次分桶儲存，方便切週時直接取
+      if (!W.rawReportsByWeek) W.rawReportsByWeek = {};
+      var firstReportWeek = d.rawReports[0].week || (d.overview && d.overview.weekNum) || 'latest';
+      W.rawReportsByWeek[firstReportWeek] = d.rawReports;
+      W.rawReports = d.rawReports;  // 相容舊邏輯
+      W.currentRawWeek = firstReportWeek;
+    }
+    if (d.orgChart) {
+      W.orgChart = d.orgChart;
+    }
+    return true;
+  }).catch(function(err) {
+    console.warn('loadLiveData failed:', err.message);
+    showLoading(false);
+    return false;
+  });
+}
+
+function showLoading(on) {
+  document.getElementById('loading-overlay').style.display = on ? 'block' : 'none';
+}
+
+// =====================================================
+// STATIC DATA (fallback)
+// =====================================================
+var W = {
+  weekLabel:'—',
+  submitted:0, late:0, missing:0, exempt:4,
+  aiSummary:'載入即時資料中...',
+  risks:[], highlights:[], missingMembers:[], emotion:[],
+  projects:[
+    {id:'tsmc',      name:'TSMC Layout 1.5', type:'project', period:'2025-10 ~ 2026-06', prog:72, ind:'on',     indO:null, summary:'載入中...', detail:'', payment:'NT$ 1,200,000', payNote:'預計 2026-07 交付後請款',     members:[], risks:[], rawLinks:[]},
+    {id:'micron',    name:'Micron Phase 2',  type:'project', period:'2026-01 ~ 2026-08', prog:45, ind:'on',     indO:null, summary:'載入中...', detail:'', payment:'NT$ 2,400,000', payNote:'次期款預計 2026-05 請款',      members:[], risks:[], rawLinks:[]},
+    {id:'teco',      name:'TECO',            type:'project', period:'2026-03 ~ 2026-09', prog:28, ind:'behind', indO:null, summary:'載入中...', detail:'', payment:'NT$ 800,000',   payNote:'里程碑付款，尚未達請款條件', members:[], risks:[], rawLinks:[]},
+    {id:'cad',       name:'CAD Agent',       type:'product', period:'2025-07 ~ 持續',    prog:85, ind:'ahead',  indO:null, summary:'載入中...', detail:'', payment:'產品線',         payNote:'',                           members:[], risks:[], rawLinks:[]},
+    {id:'asset',     name:'Asset Library',   type:'product', period:'2025-09 ~ 持續',    prog:60, ind:'on',     indO:null, summary:'載入中...', detail:'', payment:'產品線',         payNote:'',                           members:[], risks:[], rawLinks:[]},
+    {id:'builder',   name:'SceneBuilder',    type:'product', period:'2026-01 ~ 持續',    prog:40, ind:'on',     indO:null, summary:'載入中...', detail:'', payment:'產品線',         payNote:'',                           members:[], risks:[], rawLinks:[]},
+    {id:'extraction',name:'TSMC Extraction', type:'project', period:'2026-02 ~ 持續',    prog:50, ind:'on',     indO:null, summary:'載入中...', detail:'', payment:'含於TSMC合約',   payNote:'',                           members:[], risks:[], rawLinks:[]},
+    {id:'nemo',      name:'NemoClaw',        type:'product', period:'2026-03 ~ 持續',    prog:30, ind:'on',     indO:null, summary:'載入中...', detail:'', payment:'產品線',         payNote:'',                           members:[], risks:[], rawLinks:[]}
+  ],
+  rawReports:[]
+};
+
+var HC = {
+  months:['2026-01','2026-02','2026-03','2026-04','2026-05'],
+  projects:['TSMC Layout 1.5','Micron Phase 2','TECO','CAD Agent','Asset Library','PM Architecture','其他'],
+  colors:['#378add','#1d9e75','#ef9f27','#534ab7','#d85a30','#d4537e','#888780'],
+  members:[], changes:[], overloadMembers:[], idleMembers:[], source:'default',
+  projData:{}
+};
+
+var BD = {
+  ai:'載入中...',
+  icp1:[], icp2:[], other:[], detected:[]
+};
+
+var SUGGESTIONS = {
+  summary:'', items:[]
+};
+
+// TFL members
+var TFL_MEMBERS = [
+  {name:'Alex Chiu',   func:'DT',          email:'alex.chiu@met-ai.com'},
+  {name:'Kevin Zhao',  func:'AI',           email:'kevin.zhao@met-ai.com'},
+  {name:'Tan Tsai',    func:'AI-TSMC',      email:'tan.tsai@met-ai.com'},
+  {name:'Penny Shiung',func:'SceneBuilder', email:'penny.shiung@met-ai.com'},
+  {name:'Gino Chang',  func:'RD',           email:'gino.chang@met-ai.com'},
+  {name:'Chris Huang', func:'PD',           email:'chris.huang@met-ai.com'}
+];
+
+// =====================================================
+// NAVIGATION
+// =====================================================
+var curPage = 'overview';
+var projOpenCards = {};
+var bdOpenCards = {};
+var curBDTab = 'icp1';
+var curRawWeek = '';
+var hcChart = null;
+
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.remove('active'); });
+  var pageEl = document.getElementById('page-' + p);
+  if (pageEl) pageEl.classList.add('active');
+  curPage = p;
+  var renders = {
+    overview: renderOverview,
+    suggestions: renderSuggestions,
+    projects: renderProjList,
+    headcount: renderHeadcount,
+    bd: renderBD,
+    tfl: renderTFL,
+    rawreports: renderRaw
+  };
+  if (renders[p]) renders[p]();
+  // Highlight nav
+  document.querySelectorAll('.nav-item').forEach(function(el) {
+    if (el.getAttribute('onclick') && el.getAttribute('onclick').indexOf("'" + p + "'") !== -1) {
+      el.classList.add('active');
+    }
+  });
+}
+
+// =====================================================
+// HELPERS
+// =====================================================
+function fmtDate(d) {
+  if (!d) return '—';
+  var s = String(d);
+  if (s === '持續' || s === '進行中') return s;
+  // Strip time part: 2026-08-31T07:00:00.000Z -> 2026-08-31
+  var match = s.match(/^(\d{4}-\d{2}-\d{2})/);
+  return match ? match[1] : s;
+}
+
+function ind(v) {
+  var label = v === 'ahead' ? '↑ 超前' : v === 'behind' ? '↓ 落後' : '→ 符合';
+  var cls = v === 'ahead' ? 'ind-ahead' : v === 'behind' ? 'ind-behind' : 'ind-on';
+  return '<span class="ind-badge ' + cls + '">' + label + '</span>';
+}
+
+function priDot(p) {
+  var c = p === 'high' ? '#d63b3b' : p === 'mid' ? '#e8882a' : '#888780';
+  return '<span style="width:8px;height:8px;border-radius:50%;background:' + c + ';display:inline-block;flex-shrink:0;margin-top:3px"></span>';
+}
+
+function emoBar(score) {
+  var colors = ['#d63b3b','#e8882a','#f0c040','#4a9e4a','#1d9e75'];
+  var html = '';
+  for (var i = 1; i <= 5; i++) {
+    html += '<span style="width:10px;height:10px;border-radius:50%;background:' + (i <= score ? colors[score-1] : 'var(--border)') + ';display:inline-block;margin:0 1px"></span>';
+  }
+  return html;
+}
+
+// =====================================================
+// OVERVIEW
+// =====================================================
+function renderOverview() {
+  document.getElementById('ov-week-label').textContent = W.weekLabel;
+  document.getElementById('ov-ai-summary').textContent = W.aiSummary;
+  document.getElementById('ov-submitted').textContent = W.submitted;
+  document.getElementById('ov-late').textContent = W.late;
+  document.getElementById('ov-missing').textContent = W.missing;
+  document.getElementById('ov-exempt').textContent = W.exempt;
+
+  // Missing names
+  var namesEl = document.getElementById('ov-missing-names');
+  if (W.missingMembers && W.missingMembers.length) {
+    namesEl.innerHTML = W.missingMembers.map(function(n) {
+      return '<span class="member-tag">' + n + '</span>';
+    }).join('');
+  } else {
+    namesEl.innerHTML = '<span style="color:var(--ok-t);font-size:12px">全員繳交</span>';
+  }
+
+  // Projects table
+  var tbody = document.getElementById('ov-proj-body');
+  tbody.innerHTML = W.projects.map(function(p) {
+    var eff = p.indO || p.ind;
+    var pc = p.prog < 30 ? 'err' : p.prog < 70 ? 'warn' : 'ok';
+    var opts = ['on','ahead','behind'].map(function(v) {
+      return '<option value="' + v + '"' + (eff === v ? ' selected' : '') + '>' +
+        (v === 'on' ? '符合' : v === 'ahead' ? '超前' : '落後') + '</option>';
+    }).join('');
+    return '<tr>' +
+      '<td><span style="cursor:pointer;color:var(--info-t);font-weight:500" onclick="showPage(\'projects\')">' + p.name + '</span>' +
+      '<br><span style="font-size:11px;color:var(--hint)">' + (p.type === 'product' ? '產品' : '專案') + '</span></td>' +
+      '<td>' + ind(eff) + '</td>' +
+      '<td style="color:var(--muted)">' + p.summary + '</td>' +
+      '<td><select class="override-sel" data-id="' + p.id + '" onchange="overrideInd(this.dataset.id,this.value)">' + opts + '</select></td>' +
+      '</tr>';
+  }).join('');
+
+  // Timeline
+  var tlBody = document.getElementById('ov-timeline-body');
+  if (tlBody) {
+    var tl = (W.overview && W.overview.timeline) ? W.overview.timeline : [];
+    // Filter out header-like rows (where id looks like a header label)
+    tl = tl.filter(function(t) {
+      var id = String(t.id || t.name || '').trim();
+      return id && id !== '專案ID' && id !== 'id' && id !== '專案名稱';
+    });
+    if (!tl.length) {
+      tlBody.innerHTML = '<tr><td colspan="6" style="color:var(--hint);font-size:12px;padding:10px 0">尚無時程資料</td></tr>';
+    } else {
+      tlBody.innerHTML = tl.map(function(t) {
+        var prog = Number(t.progress) || 0;
+        var pc = prog < 30 ? 'err' : prog < 70 ? 'warn' : 'ok';
+        var statusBadge = t.status === 'active' ? 'badge-ok' : t.status === 'delayed' ? 'badge-err' : 'badge-muted';
+        var statusText  = t.status === 'active' ? '進行中' : t.status === 'delayed' ? '延遲' : (t.status||'—');
+        return '<tr>' +
+          '<td style="font-weight:500">' + (t.name||t.id||'—') + '</td>' +
+          '<td style="color:var(--muted);font-size:12px">' + fmtDate(t.start) + '</td>' +
+          '<td style="color:var(--muted);font-size:12px">' + fmtDate(t.end) + '</td>' +
+          '<td><div style="display:flex;align-items:center;gap:6px">' +
+            '<div class="prog-wrap"><div class="prog-fill ' + pc + '" style="width:' + prog + '%"></div></div>' +
+            '<span style="font-size:12px;color:var(--muted)">' + prog + '%</span>' +
+          '</div></td>' +
+          '<td style="font-size:12px">' + (t.payment ? String(t.payment).replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,') : '—') + '</td>' +
+          '<td><span class="badge ' + statusBadge + '">' + statusText + '</span></td>' +
+          '</tr>';
+      }).join('');
+    }
+  }
+
+  // Risks
+  var risksEl = document.getElementById('ov-risks');
+  risksEl.innerHTML = W.risks.slice(0,3).map(function(r) {
+    return '<div class="risk-item">' +
+      '<div class="risk-dot ' + r.level + '"></div>' +
+      '<div style="font-size:13px;color:var(--muted);line-height:1.5">' + r.text + '</div>' +
+      '</div>';
+  }).join('') || '<div style="color:var(--hint);font-size:12px;padding:8px 0">本週無風險預警</div>';
+
+  // Highlights
+  var hlEl = document.getElementById('ov-highlights');
+  hlEl.innerHTML = W.highlights.slice(0,3).map(function(h) {
+    return '<div class="risk-item">' +
+      '<div style="color:#4a9e4a;font-size:14px;flex-shrink:0">●</div>' +
+      '<div style="font-size:13px;color:var(--muted);line-height:1.5">' + h.text + '</div>' +
+      '</div>';
+  }).join('') || '<div style="color:var(--hint);font-size:12px;padding:8px 0">本週無特別亮點</div>';
+
+  // Emotion
+  var alertEl = document.getElementById('ov-emotion-alert');
+  var allEl = document.getElementById('ov-emotion-all');
+  if (!W.emotion || !W.emotion.length) {
+    alertEl.innerHTML = '<div style="color:var(--hint);font-size:12px;padding:8px 0">本週無情緒資料</div>';
+    return;
+  }
+  // Dedup by name
+  var seenNames = {};
+  var uniqueEmo = W.emotion.filter(function(e) {
+    if (seenNames[e.name]) return false;
+    seenNames[e.name] = true;
+    return true;
+  });
+
+  function emoRow(e, compact) {
+    var score = Number(e.score) || 3;
+    var needAttn = score <= 2;
+    var labelColor = score <= 2 ? 'var(--err-t)' : score >= 4 ? 'var(--ok-t)' : 'var(--muted)';
+    var bg = needAttn ? 'background:var(--err-bg);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:6px' : 'padding:8px 0;border-bottom:0.5px solid var(--border)';
+    return '<div style="display:flex;align-items:flex-start;gap:12px;' + bg + '">' +
+      '<div style="display:flex;gap:2px;flex-shrink:0;margin-top:3px">' + emoBar(score) + '</div>' +
+      '<div>' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">' +
+          '<span style="font-weight:500;font-size:13px">' + e.name + '</span>' +
+          '<span style="font-size:11px;color:' + labelColor + ';font-weight:500">' + (e.label||'') + '</span>' +
+          (needAttn ? '<span class="badge badge-err" style="font-size:10px">需關心</span>' : '') +
+        '</div>' +
+        (!compact || needAttn ? '<div style="font-size:12px;color:var(--muted)">' + (e.note||'') + '</div>' : '') +
+      '</div>' +
+      '</div>';
+  }
+
+  var needCare = uniqueEmo.filter(function(e) { return Number(e.score) <= 2; });
+  var normal = uniqueEmo.filter(function(e) { return Number(e.score) > 2; });
+
+  // Alert section: need care members always visible
+  if (needCare.length) {
+    alertEl.innerHTML = needCare.map(function(e) { return emoRow(e, false); }).join('');
+  } else {
+    alertEl.innerHTML = '<div style="color:var(--ok-t);font-size:12px;padding:6px 0">本週無需特別關心的成員</div>';
+  }
+
+  // HR content from Lynn Chen's report - AI summarized
+  var hrEl = document.getElementById('ov-hr-content');
+  if (hrEl) {
+    if (W.rawReports && W.rawReports.length) {
+      var lynnReport = W.rawReports.find(function(r) {
+        var m = (r.member || '').toLowerCase();
+        return m.indexOf('lynn') !== -1;
+      });
+      if (lynnReport && lynnReport.content) {
+        // Use server-generated HR summary if available
+        if (W.overview && W.overview.hrSummary) {
+          var lines = W.overview.hrSummary.split('\n').filter(function(l){ return l.trim(); });
+          hrEl.innerHTML = lines.map(function(l){ return '<div style="margin-bottom:6px">'+l.trim()+'</div>'; }).join('');
+        } else {
+          hrEl.innerHTML = '<span style="color:var(--hint)">AI 摘要產生中...</span>';
+          summarizeHRReport(lynnReport.content, hrEl);
+        }
+      } else {
+        hrEl.innerHTML = '<span style="color:var(--hint)">本週無招募資料（確認 Lynn Chen 週報是否已寄出）</span>';
+      }
+    } else {
+      hrEl.innerHTML = '<span style="color:var(--hint)">載入中...</span>';
+    }
+  }
+
+  // Toggle btn
+  var btn = document.getElementById('ov-emo-toggle-btn');
+  btn.textContent = '展開全部（' + normal.length + ' 人）';
+
+  // All section: normal members collapsed by default
+  allEl.innerHTML = '<div style="border-top:0.5px solid var(--border);margin-top:8px;padding-top:8px">' +
+    normal.map(function(e) { return emoRow(e, true); }).join('') +
+    '</div>';
+}
+
+var _emoAllOpen = false;
+function toggleAllEmo() {
+  _emoAllOpen = !_emoAllOpen;
+  var allEl = document.getElementById('ov-emotion-all');
+  var btn = document.getElementById('ov-emo-toggle-btn');
+  allEl.style.display = _emoAllOpen ? 'block' : 'none';
+  var normal = (W.emotion || []).filter(function(e) { return Number(e.score) > 2; });
+  btn.textContent = _emoAllOpen ? '收起' : '展開全部（' + normal.length + ' 人）';
+}
+
+function overrideInd(id, val) {
+  var p = W.projects.find(function(x) { return x.id === id; });
+  if (p) { p.indO = val; renderOverview(); }
+}
+
+// =====================================================
+// SUGGESTIONS
+// =====================================================
+var curSugSort = 'priority';
+
+function setSugSort(s) {
+  curSugSort = s;
+  renderSugList();
+}
+
+function renderSuggestions() {
+  renderSugList();
+}
+
+function renderSugList() {
+  var el = document.getElementById('sug-list');
+  var items = SUGGESTIONS.items.slice();
+  if (curSugSort === 'priority') {
+    var order = {high:0, mid:1, low:2, '高':0, '中':1, '低':2};
+    items.sort(function(a,b) {
+      var av = order[a.priority]; if (av === undefined) av = 9;
+      var bv = order[b.priority]; if (bv === undefined) bv = 9;
+      return av - bv;
+    });
+  } else {
+    items.sort(function(a,b) { return (a.category||'').localeCompare(b.category||''); });
+  }
+  if (!items.length) {
+    el.innerHTML = '<div style="padding:16px 0;color:var(--muted);font-size:13px">本週無建議項目</div>';
+    return;
+  }
+  var catColors = {
+    '人力':'var(--err-bg)','人員關懷':'var(--purple-bg)',
+    '專案':'var(--warn-bg)','技術':'var(--ok-bg)','流程':'var(--ok-bg)'
+  };
+  el.innerHTML = items.map(function(s, i) {
+    return '<div class="sug-card">' +
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px">' +
+        '<div style="display:flex;align-items:flex-start;gap:8px">' +
+          priDot(s.priority) +
+          '<div>' +
+            '<div style="font-weight:500;font-size:14px">' + s.title + '</div>' +
+            '<span style="display:inline-block;margin-top:4px;font-size:11px;padding:2px 8px;border-radius:20px;background:' + (catColors[s.category]||'var(--bg)') + ';color:var(--text)">' + (s.category||'') + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--hint);white-space:nowrap">' + (['','高優先','中優先','低優先'][{high:1,mid:2,low:3}[s.priority]||0]||'') + '</div>' +
+      '</div>' +
+      '<div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:10px">' + (s.detail||'') + '</div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between">' +
+        '<div style="font-size:12px"><span style="color:var(--muted)">行動：</span><span style="color:var(--text)">' + (s.action||'') + '</span></div>' +
+        '<button style="font-size:11px;padding:3px 10px" onclick="this.textContent=(this.textContent===\'✓ 已處理\'?\'標記已處理\':\'✓ 已處理\');this.style.color=(this.textContent===\'✓ 已處理\'?\'var(--ok-t)\':\'var(--text)\')">標記已處理</button>' +
+      '</div>' +
+      '</div>';
+  }).join('');
+}
+
+// =====================================================
+// PROJECTS
+// =====================================================
+function renderProjList() {
+  var el = document.getElementById('proj-list');
+  el.innerHTML = W.projects.map(function(p) {
+    var eff = p.indO || p.ind;
+    var bc = eff === 'ahead' ? 'var(--ok-b)' : eff === 'behind' ? 'var(--err-b)' : 'var(--border)';
+    var pc = p.prog < 30 ? 'err' : p.prog < 70 ? 'warn' : 'ok';
+    var isOpen = projOpenCards[p.id];
+    return '<div class="proj-card" style="border-color:' + bc + '">' +
+      '<div class="proj-card-header" onclick="toggleProjCard(\'' + p.id + '\')">' +
+        '<div style="display:flex;align-items:center;gap:10px">' +
+          ind(eff) +
+          '<div>' +
+            '<div style="font-weight:500">' + p.name + '</div>' +
+            '<div style="font-size:11px;color:var(--hint)">' + p.period + ' · ' + (p.type === 'product' ? '產品' : '專案') + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:10px">' +
+          '<div class="prog-wrap" style="width:80px"><div class="prog-fill ' + pc + '" style="width:' + p.prog + '%"></div></div>' +
+          '<span style="font-size:13px;color:var(--muted)">' + p.prog + '%</span>' +
+          '<span style="font-size:13px;color:var(--muted)">' + (isOpen ? '▲' : '▼') + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="proj-card-body' + (isOpen ? ' open' : '') + '" id="proj-body-' + p.id + '">' +
+        '<div class="detail-row"><div class="detail-label">本週摘要</div><div>' + p.summary + '</div></div>' +
+        '<div class="detail-row"><div class="detail-label">進度說明</div><div style="color:var(--muted)">' + (p.detail||'—') + '</div></div>' +
+        '<div class="detail-row"><div class="detail-label">款項</div><div>' + p.payment + (p.payNote ? '<span style="color:var(--muted);margin-left:8px;font-size:12px">' + p.payNote + '</span>' : '') + '</div></div>' +
+        (p.risks && p.risks.length ? '<div class="detail-row"><div class="detail-label">風險</div><div>' + p.risks.map(function(r) { return '<div class="risk-item" style="padding:4px 0"><div class="risk-dot ' + r.level + '"></div><div style="font-size:12px;color:var(--muted)">' + r.text + '</div></div>'; }).join('') + '</div></div>' : '') +
+        (p.members && p.members.length ? renderProjMembers(p.members) : '') +
+      '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function renderProjMembers(members) {
+  return '<div style="margin-top:12px">' +
+    '<div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:8px">成員本週工作（' + members.length + ' 位）</div>' +
+    members.map(function(m) {
+      var hasMilestone = m.milestone && m.milestone !== '無' && m.milestone !== '';
+      var hasBlocker   = m.blocker   && m.blocker   !== '無' && m.blocker   !== '';
+      var hasNext      = m.nextStep  && m.nextStep  !== '無' && m.nextStep  !== '';
+      // fallback to old fields
+      if (!hasMilestone && !hasBlocker && !hasNext) {
+        return '<div class="member-row">' +
+          '<div style="min-width:80px;font-size:13px;font-weight:500">' + m.name + '</div>' +
+          '<div style="flex:1;font-size:12px;color:var(--muted)">' +
+            '<div>' + (m.work||'—') + '</div>' +
+            (m.challenge ? '<div style="margin-top:3px;color:var(--warn-t)">困難：' + m.challenge + '</div>' : '') +
+            (m.nextWeek  ? '<div style="margin-top:3px;color:var(--hint)">下週：' + m.nextWeek + '</div>' : '') +
+          '</div></div>';
+      }
+      return '<div style="padding:10px 0;border-bottom:0.5px solid var(--border)">' +
+        '<div style="font-weight:500;font-size:13px;margin-bottom:8px">' + m.name + '</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">' +
+          '<div style="background:var(--ok-bg);border-radius:var(--r-sm);padding:8px 10px">' +
+            '<div style="font-size:10px;font-weight:600;color:var(--ok-t);margin-bottom:3px;letter-spacing:.05em">✓ MILESTONE</div>' +
+            '<div style="font-size:12px;color:var(--text)">' + (hasMilestone ? m.milestone : '本週無特定里程碑') + '</div>' +
+          '</div>' +
+          '<div style="background:' + (hasBlocker ? 'var(--err-bg)' : 'var(--bg)') + ';border-radius:var(--r-sm);padding:8px 10px">' +
+            '<div style="font-size:10px;font-weight:600;color:' + (hasBlocker ? 'var(--err-t)' : 'var(--hint)') + ';margin-bottom:3px;letter-spacing:.05em">⚠ BLOCKER</div>' +
+            '<div style="font-size:12px;color:var(--text)">' + (hasBlocker ? m.blocker : '無阻礙') + '</div>' +
+          '</div>' +
+          '<div style="background:var(--info-bg);border-radius:var(--r-sm);padding:8px 10px">' +
+            '<div style="font-size:10px;font-weight:600;color:var(--info-t);margin-bottom:3px;letter-spacing:.05em">→ NEXT STEP</div>' +
+            '<div style="font-size:12px;color:var(--text)">' + (hasNext ? m.nextStep : (m.nextWeek||'—')) + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('') +
+  '</div>';
+}
+
+function toggleProjCard(id) {
+  projOpenCards[id] = !projOpenCards[id];
+  renderProjList();
+}
+
+// =====================================================
+// HEADCOUNT
+// =====================================================
+function renderHeadcount() {
+  document.getElementById('hc-ai-text').textContent = HC.aiNote || '人力分配資料來自 PM Sheet，每週自動更新。';
+  renderHCChart();
+  renderHCMemberTable();
+  renderHCOverload();
+  renderOrgChart();
+}
+
+
+function renderHCChart() {
+  var canvas = document.getElementById('hc-chart');
+  if (!canvas) return;
+  if (hcChart) { hcChart.destroy(); hcChart = null; }
+  if (typeof Chart === 'undefined') {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+    s.onload = function() { buildHCChart(canvas); };
+    document.head.appendChild(s);
+  } else {
+    buildHCChart(canvas);
+  }
+}
+
+function buildHCChart(canvas) {
+  // pm_sheet format: HC.weeks = date labels, HC.projData = {projName: [v1,v2,...]}
+  // default format: HC.months = labels, HC.members = [{name, data:[...]}]
+  var labels = (HC.source === 'pm_sheet') ? HC.weeks : HC.months;
+  var datasets = [];
+
+  if (HC.source === 'pm_sheet' && HC.projData) {
+    datasets = HC.projects.map(function(proj, i) {
+      var arr = HC.projData[proj] || [];
+      return { label: proj, data: arr, backgroundColor: HC.colors[i] || '#888', stack: 'a' };
+    });
+  } else if (HC.members && HC.members.length) {
+    // member-based: stack per project
+    datasets = HC.projects.map(function(proj, i) {
+      var data = labels.map(function(mo, mi) {
+        var total = 0;
+        HC.members.forEach(function(m) {
+          if (m.project === proj && m.data && m.data[mi] !== undefined) {
+            total += Number(m.data[mi]) || 0;
+          }
+        });
+        return total;
+      });
+      return { label: proj, data: data, backgroundColor: HC.colors[i] || '#888', stack: 'a' };
+    });
+  }
+
+  datasets.push({
+    label: '過載線 100%',
+    data: labels.map(function() { return 100; }),
+    type: 'line', borderColor: '#d63b3b', borderDash: [4,3],
+    borderWidth: 1.5, pointRadius: 0, fill: false
+  });
+
+  hcChart = new Chart(canvas, {
+    type: 'bar',
+    data: { labels: labels, datasets: datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        x: { stacked: true, ticks: { font: { size: 10 }, maxRotation: 45 } },
+        y: { stacked: true, max: 150, ticks: { callback: function(v) { return v + '%'; } } }
+      },
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 12 } } }
+    }
+  });
+}
+
+function renderHCMemberTable() {
+  var el = document.getElementById('hc-member-table');
+  if (!HC.members || !HC.members.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0">資料載入中...</div>';
+    return;
+  }
+  var active = HC.members.filter(function(m) {
+    return m.name && m.name !== 'TBD' && m.name.indexOf('New ') === -1;
+  });
+
+  // 分類：過載 / 低負載 / 正常（無分配也算正常區）
+  var abnormal = [], normal = [];
+  active.forEach(function(m) {
+    var total = Number(m.total) || 0;
+    var ov   = m.isOverload || total > 100;
+    var idle = m.isIdle || (total > 0 && total < 50);
+    if (ov || idle) abnormal.push(m); else normal.push(m);
+  });
+
+  if (window._hcExpanded === undefined) window._hcExpanded = false;
+  var toShow = window._hcExpanded ? active : abnormal;
+
+  function rowHTML(m) {
+    var total = Number(m.total) || 0;
+    var ov   = m.isOverload || total > 100;
+    var idle = m.isIdle || (total > 0 && total < 50);
+    var none = total === 0;
+    var sc = ov ? 'var(--err-t)' : idle ? 'var(--info-t)' : none ? 'var(--hint)' : 'var(--ok-t)';
+    var st = ov ? '⚠ 過載' : idle ? '↓ 低負載' : none ? '—' : '✓ 正常';
+    return '<tr>' +
+      '<td style="font-size:13px;padding:7px 8px;font-weight:500">' + m.name + '</td>' +
+      '<td style="font-size:12px;padding:7px 8px;color:var(--muted)">' + (m.team||'') + '</td>' +
+      '<td style="text-align:right;font-size:13px;padding:7px 8px;font-weight:500;color:' + (ov?'var(--err-t)':none?'var(--hint)':'var(--text)') + '">' + (none?'—':total+'%') + '</td>' +
+      '<td style="font-size:12px;padding:7px 8px;color:' + sc + '">' + st + '</td>' +
+    '</tr>';
+  }
+
+  var html = '';
+  if (!window._hcExpanded) {
+    if (abnormal.length === 0) {
+      html += '<div style="color:var(--ok-t);font-size:13px;padding:12px 0;text-align:center">✓ 本期所有成員投入比例皆在正常範圍</div>';
+    } else {
+      html += '<div style="font-size:11px;color:var(--hint);margin-bottom:6px">需關注（' + abnormal.length + ' 位）</div>';
+    }
+  }
+  if (toShow.length > 0) {
+    html += '<table style="width:100%;border-collapse:collapse"><thead><tr>' +
+      '<th style="text-align:left;font-size:11px;color:var(--hint);padding:6px 8px;border-bottom:0.5px solid var(--border)">成員</th>' +
+      '<th style="text-align:left;font-size:11px;color:var(--hint);padding:6px 8px;border-bottom:0.5px solid var(--border)">Team</th>' +
+      '<th style="text-align:right;font-size:11px;color:var(--hint);padding:6px 8px;border-bottom:0.5px solid var(--border)">加總投入</th>' +
+      '<th style="text-align:left;font-size:11px;color:var(--hint);padding:6px 8px;border-bottom:0.5px solid var(--border)">狀態</th>' +
+      '</tr></thead><tbody>';
+    toShow.forEach(function(m) { html += rowHTML(m); });
+    html += '</tbody></table>';
+  }
+  // 摺疊切換
+  html += '<div style="text-align:center;margin-top:10px">' +
+    '<button onclick="toggleHCExpand()" style="background:transparent;border:0.5px solid var(--border);padding:6px 14px;border-radius:6px;font-size:12px;color:var(--muted);cursor:pointer">' +
+    (window._hcExpanded ? '收起，只看需關注（' + abnormal.length + ' 位）' : '顯示全部 ' + active.length + ' 位成員') +
+    '</button></div>';
+  el.innerHTML = html;
+}
+
+function toggleHCExpand() {
+  window._hcExpanded = !window._hcExpanded;
+  renderHCMemberTable();
+}
+
+function renderHCOverload() {
+  var el = document.getElementById('hc-overload-info');
+  if (!HC.overloadMembers || !HC.overloadMembers.length) {
+    el.innerHTML = '<span style="color:var(--ok-t);font-size:12px">本期無人員過載</span>';
+    return;
+  }
+  var names = HC.overloadMembers.map(function(m) {
+    var name = (typeof m === 'object') ? m.name : m;
+    var total = (typeof m === 'object' && m.total) ? ' (' + m.total + '%)' : '';
+    return name + total;
+  });
+  el.innerHTML = '<span style="color:var(--err-t);font-size:12px">⚠ 過載成員：' + names.join('、') + '</span>' +
+    (HC.idleMembers && HC.idleMembers.length ? '<br><span style="color:var(--info-t);font-size:12px;margin-top:4px;display:block">低負載成員：' + HC.idleMembers.map(function(m){ return typeof m==='object'?m.name:m; }).join('、') + '</span>' : '');
+}
+
+// =====================================================
+// ORG CHART (組織概覽)
+// =====================================================
+function renderOrgChart() {
+  var card = document.getElementById('org-overview-card');
+  if (!card) return;
+  var org = (W && W.orgChart) ? W.orgChart : null;
+  if (!org || !org.departments || !org.departments.length) {
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = '';
+
+  document.getElementById('org-total-count').textContent = '總人數 ' + org.totalCount + ' 人';
+
+  if (!window._orgOpen) window._orgOpen = {};
+
+  var html = org.departments.map(function(dept, di) {
+    var isOpen = window._orgOpen['d_' + di];
+    var smallHTML = '';
+    if (isOpen) {
+      smallHTML = '<div style="padding:6px 0 8px 16px">' +
+        dept.smallDepts.map(function(sm, smi) {
+          var smOpen = window._orgOpen['d_' + di + '_s_' + smi];
+          var membersHTML = '';
+          if (smOpen) {
+            membersHTML = '<div style="padding:4px 0 8px 16px;display:flex;flex-wrap:wrap;gap:6px">' +
+              sm.members.map(function(m) {
+                return '<span style="font-size:12px;color:var(--muted);background:var(--bg);padding:3px 8px;border-radius:4px">' +
+                  m.name + (m.role ? '<span style="color:var(--hint);margin-left:4px">·' + m.role + '</span>' : '') +
+                  '</span>';
+              }).join('') +
+              '</div>';
+          }
+          return '<div style="margin-top:4px">' +
+            '<div style="cursor:pointer;font-size:12px;padding:4px 0;display:flex;align-items:center;justify-content:space-between" onclick="toggleOrgSmall(' + di + ',' + smi + ')">' +
+              '<span><span style="color:var(--hint);margin-right:6px">' + (smOpen ? '▾' : '▸') + '</span>' +
+              sm.name + ' <span style="color:var(--hint);margin-left:4px">(' + sm.count + ')</span></span>' +
+            '</div>' +
+            membersHTML +
+            '</div>';
+        }).join('') +
+        '</div>';
+    }
+    return '<div style="border-bottom:0.5px solid var(--border);padding:8px 0">' +
+      '<div style="cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="toggleOrgDept(' + di + ')">' +
+        '<span style="font-size:13px;font-weight:500"><span style="color:var(--muted);margin-right:6px">' + (isOpen ? '▾' : '▸') + '</span>' +
+        dept.name + '</span>' +
+        '<span style="font-size:12px;color:var(--muted)">' + dept.count + ' 人</span>' +
+      '</div>' +
+      smallHTML +
+      '</div>';
+  }).join('');
+  document.getElementById('org-tree').innerHTML = html;
+
+  // 不一致提示
+  var mismatchEl = document.getElementById('org-mismatch');
+  if (org.mismatches && org.mismatches.length) {
+    mismatchEl.innerHTML = '<div style="background:var(--warn-bg, #fff8e1);border:0.5px solid #f0d68a;padding:8px 12px;border-radius:6px;font-size:11px;color:#9a7a1a">' +
+      '⚠ org_chart 與 PM 人力表名單不一致（' + org.mismatches.length + ' 筆）：' +
+      org.mismatches.slice(0, 8).map(function(mm) { return mm.name + '<span style="color:#b8a460;margin-left:4px">（' + mm.issue + '）</span>'; }).join('、') +
+      (org.mismatches.length > 8 ? '...' : '') +
+      '</div>';
+  } else {
+    mismatchEl.innerHTML = '';
+  }
+}
+
+function toggleOrgDept(di) {
+  if (!window._orgOpen) window._orgOpen = {};
+  window._orgOpen['d_' + di] = !window._orgOpen['d_' + di];
+  renderOrgChart();
+}
+
+function toggleOrgSmall(di, smi) {
+  if (!window._orgOpen) window._orgOpen = {};
+  window._orgOpen['d_' + di + '_s_' + smi] = !window._orgOpen['d_' + di + '_s_' + smi];
+  renderOrgChart();
+}
+
+// =====================================================
+// BD
+// =====================================================
+function renderBD() {
+  document.getElementById('bd-ai-text').textContent = BD.ai || '載入中...';
+  setBDTab(curBDTab);
+}
+
+function setBDTab(tab) {
+  curBDTab = tab;
+  ['icp1','icp2','other','detected'].forEach(function(t) {
+    document.getElementById('bd-' + t + '-panel').style.display = t === tab ? 'block' : 'none';
+    document.getElementById('bdtab-' + t).classList.toggle('active', t === tab);
+  });
+  if (tab === 'icp1') renderBDCards('bd-icp1-list', BD.icp1, true);
+  if (tab === 'icp2') renderBDCards('bd-icp2-list', BD.icp2, false);
+  if (tab === 'other') renderBDCards('bd-other-list', BD.other, false);
+  if (tab === 'detected') {
+    document.getElementById('bd-det-count').textContent = BD.detected.length + ' 筆';
+    document.getElementById('bd-detected-list').innerHTML = BD.detected.map(function(d) {
+      var tagColor = (d.icp && (d.icp.indexOf('DC') !== -1 || d.icp.indexOf('1') !== -1)) ? 'badge-info' : 'badge-purple';
+      return '<div style="padding:10px 0;border-bottom:0.5px solid var(--border);font-size:13px">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
+          '<span style="font-weight:500">' + d.member + '</span>' +
+          '<span class="badge ' + tagColor + '">' + d.icp + '</span>' +
+          '<span style="font-size:11px;color:var(--hint)">' + d.week + '</span>' +
+        '</div>' +
+        '<div style="color:var(--muted)">' + d.mention + '</div>' +
+        '</div>';
+    }).join('');
+  }
+}
+
+function renderBDCards(elId, list, showTag) {
+  var el = document.getElementById(elId);
+  if (!list || !list.length) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:12px 0">尚無資料</div>';
+    return;
+  }
+  el.innerHTML = list.map(function(c) {
+    var tagBadge = showTag ? '<span class="badge ' + (c.tag === 'DC' ? 'badge-info' : 'badge-purple') + '" style="margin-right:6px">' + c.tag + '</span>' : '';
+    var isOpen = bdOpenCards[c.company];
+    return '<div style="background:var(--card);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:8px">' +
+      '<div style="padding:12px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="toggleBDCard(\'' + (c.company||'').replace(/'/g,"\\'") + '\')">' +
+        '<div style="display:flex;align-items:center;gap:8px">' +
+          tagBadge +
+          '<span style="font-weight:500;font-size:14px">' + c.company + '</span>' +
+          '<span class="badge ' + c.badge + '">' + c.badgeText + '</span>' +
+        '</div>' +
+        '<span style="font-size:13px;color:var(--muted)">' + (isOpen ? '▲' : '▼') + '</span>' +
+      '</div>' +
+      (isOpen ? '<div style="padding:12px 16px;border-top:0.5px solid var(--border)">' +
+        '<div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:8px">' + c.detail + '</div>' +
+        '<div style="font-size:12px;color:var(--muted)">聯絡人：' + c.contact + '</div>' +
+        '<div style="margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:var(--r-sm);font-size:12px">' +
+          '<span style="color:var(--muted)">下一步：</span><span style="font-weight:500">' + c.next + '</span>' +
+        '</div></div>' : '') +
+      '</div>';
+  }).join('');
+}
+
+function toggleBDCard(company) {
+  bdOpenCards[company] = !bdOpenCards[company];
+  setBDTab(curBDTab);
+}
+
+// =====================================================
+// TFL
+// =====================================================
+function renderTFL() {
+  var tflData = window._tflData;
+  var summaryEl = document.getElementById('tfl-summary-text');
+  var listEl = document.getElementById('tfl-list');
+
+  if (tflData && tflData.members && tflData.members.length) {
+    summaryEl.textContent = 'TFL 週報彙整（即時資料）：共 ' + tflData.members.length + ' 位 TFL 已分析。';
+    listEl.innerHTML = tflData.members.map(function(m) {
+      return '<div class="tfl-card">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
+          '<span style="font-weight:500">' + m.name + '</span>' +
+          '<span class="badge badge-info">' + m.func + '</span>' +
+          (m.needsCOOAttention ? '<span class="badge badge-err">需關注</span>' : '') +
+        '</div>' +
+        '<div style="font-size:13px;color:var(--muted);margin-bottom:6px">' + (m.functionSummary||'—') + '</div>' +
+        (m.keyProgress && m.keyProgress.length ? '<div style="font-size:12px;color:var(--ok-t);margin-bottom:4px">關鍵進展：' + m.keyProgress.join(' / ') + '</div>' : '') +
+        (m.blockers && m.blockers.length ? '<div style="font-size:12px;color:var(--warn-t)">阻礙：' + m.blockers.join(' / ') + '</div>' : '') +
+        '</div>';
+    }).join('');
+  } else {
+    // Static TFL fallback
+    summaryEl.textContent = 'TFL 週報彙整：共 ' + TFL_MEMBERS.length + ' 位 TFL。點擊查看原始週報。';
+    listEl.innerHTML = TFL_MEMBERS.map(function(t) {
+      var report = W.rawReports.find(function(r) { return r.member && r.member.indexOf(t.name.split(' ')[0]) !== -1; });
+      return '<div class="tfl-card">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
+          '<span style="font-weight:500">' + t.name + '</span>' +
+          '<span class="badge badge-info">' + t.func + '</span>' +
+        '</div>' +
+        '<div style="font-size:13px;color:var(--muted)">' + (report ? extractProgress(report.content) : '尚未收到本週週報') + '</div>' +
+        '</div>';
+    }).join('');
+  }
+}
+
+function extractProgress(content) {
+  if (!content) return '無法萃取，週報內容為空';
+  var lines = content.split('\n').filter(function(l) {
+    return /完成|進度|推進|建立|完善|實作|整合|部署|測試|驗證|問題|阻礙|下週|計畫/i.test(l);
+  });
+  return lines.slice(0,3).join('；') || '請查看原始週報了解詳情';
+}
+
+// =====================================================
+// RAW REPORTS
+// =====================================================
+var curRawWeek = 'latest';
+
+// 計算 W21 -> ['W21', 'W20', 'W19', 'W18']
+function getRecentWeekNums(currentWeek) {
+  var s = String(currentWeek || '').trim();
+  var m = s.match(/^W?(\d+)/i);
+  if (!m) return [currentWeek, '', '', ''];
+  var n = parseInt(m[1], 10);
+  return [n, n-1, n-2, n-3].map(function(x) { return 'W' + x; });
+}
+
+function renderRaw() {
+  var bar = document.getElementById('raw-week-bar');
+  var currentWeek = (W.overview && W.overview.weekNum) || W.currentRawWeek || '';
+  var weekNums = getRecentWeekNums(currentWeek);
+
+  // 預設選中第一週（本週）
+  if (!curRawWeek || curRawWeek === 'latest') curRawWeek = weekNums[0];
+
+  refreshRawBarCounts();
+  loadRawWeek(curRawWeek);
+}
+
+function switchRawWeek(wk) {
+  curRawWeek = wk;
+  // 切週時清掉展開狀態，避免不同週按 index 對到錯的人
+  window._rawOpen = {};
+  loadRawWeek(wk);
+  refreshRawBarCounts();
+}
+
+function loadRawWeek(wk) {
+  var listEl = document.getElementById('raw-list');
+  var cached = W.rawReportsByWeek && W.rawReportsByWeek[wk];
+  if (cached) {
+    W.rawReports = cached;
+    updateProjFilterOptions(cached);
+    renderRawList();
+    return;
+  }
+  // 沒快取，呼叫 server
+  listEl.innerHTML = '<div style="padding:16px 0;color:var(--muted);font-size:13px">載入 ' + wk + ' 週報中...</div>';
+  fetch(SCRIPT_URL + '?action=raw&week=' + encodeURIComponent(wk))
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      var reports = Array.isArray(data) ? data : [];
+      if (!W.rawReportsByWeek) W.rawReportsByWeek = {};
+      W.rawReportsByWeek[wk] = reports;
+      W.rawReports = reports;
+      updateProjFilterOptions(reports);
+      renderRawList();
+      refreshRawBarCounts();
+    })
+    .catch(function(err) {
+      listEl.innerHTML = '<div style="padding:16px 0;color:var(--err-t);font-size:13px">載入失敗：' + err.message + '</div>';
+    });
+}
+
+function refreshRawBarCounts() {
+  var bar = document.getElementById('raw-week-bar');
+  if (!bar) return;
+  var currentWeek = (W.overview && W.overview.weekNum) || W.currentRawWeek || '';
+  var weekNums = getRecentWeekNums(currentWeek);
+  var labels = ['本週', '上週', '前兩週', '前三週'];
+  bar.innerHTML = weekNums.map(function(wk, i) {
+    var isActive = wk === curRawWeek;
+    var cached = W.rawReportsByWeek && W.rawReportsByWeek[wk];
+    // 顯示人數而非封數，跟首頁繳交數對得起來
+    var countText = '';
+    if (cached) {
+      var people = {};
+      cached.forEach(function(r) { if (r.member) people[r.member] = true; });
+      countText = '（' + Object.keys(people).length + ' 人）';
+    }
+    return '<div class="week-btn' + (isActive ? ' active' : '') + '" ' +
+           'onclick="switchRawWeek(\'' + wk + '\')" ' +
+           'style="cursor:pointer">' +
+           labels[i] + ' ' + wk + countText + '</div>';
+  }).join('');
+}
+
+function updateProjFilterOptions(reports) {
+  var sel = document.getElementById('raw-proj-filter');
+  if (!sel) return;
+  var prevValue = sel.value;
+  var projects = [];
+  reports.forEach(function(r) {
+    if (r.project && projects.indexOf(r.project) === -1) projects.push(r.project);
+  });
+  sel.innerHTML = '<option value="">所有專案</option>' + projects.sort().map(function(p) {
+    return '<option value="' + p + '"' + (p === prevValue ? ' selected' : '') + '>' + p + '</option>';
+  }).join('');
+}
+
+function setRawWeek(w) { switchRawWeek(w); }
+function filterRaw() { renderRawList(); }
+
+function renderRawList() {
+  var el = document.getElementById('raw-list');
+  var search = (document.getElementById('raw-search').value || '').toLowerCase();
+  var projFilter = document.getElementById('raw-proj-filter').value;
+
+  var reports = (W.rawReports || []).filter(function(r) {
+    if (projFilter && r.project !== projFilter) return false;
+    if (search) {
+      var memberMatch = r.member && r.member.toLowerCase().indexOf(search) !== -1;
+      var contentMatch = r.content && r.content.toLowerCase().indexOf(search) !== -1;
+      if (!memberMatch && !contentMatch) return false;
+    }
+    return true;
+  });
+
+  if (!reports.length) {
+    el.innerHTML = '<div style="padding:16px 0;color:var(--muted);font-size:13px">無符合條件的週報</div>';
+    return;
+  }
+
+  // 以人聚合：member 為 key，蒐集該人所有信件並按時間倒序
+  var grouped = {};
+  reports.forEach(function(r) {
+    var name = r.member || '—';
+    if (!grouped[name]) grouped[name] = [];
+    grouped[name].push(r);
+  });
+  Object.keys(grouped).forEach(function(name) {
+    grouped[name].sort(function(a, b) {
+      return String(b.at || '').localeCompare(String(a.at || ''));
+    });
+  });
+
+  // 排序：信件多的人排前面
+  var people = Object.keys(grouped).sort(function(a, b) {
+    return grouped[b].length - grouped[a].length;
+  });
+
+  el.innerHTML = people.map(function(name, i) {
+    var letters = grouped[name];
+    var isPersonOpen = window._rawOpen && window._rawOpen['p_' + i];
+    var lastAt = letters[0] ? fmtRawAt(letters[0].at) : '';
+    var countBadge = letters.length > 1
+      ? '<span style="background:var(--accent);color:white;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:8px">' + letters.length + ' 封</span>'
+      : '<span style="color:var(--hint);font-size:11px;margin-left:8px">1 封</span>';
+
+    var lettersHTML = '';
+    if (isPersonOpen) {
+      lettersHTML = '<div style="padding:8px 16px 12px 16px;border-top:0.5px solid var(--border);background:var(--bg)">' +
+        letters.map(function(r, j) {
+          var letterKey = 'l_' + i + '_' + j;
+          var isLetterOpen = window._rawOpen && window._rawOpen[letterKey];
+          return '<div style="background:var(--card);border:0.5px solid var(--border);border-radius:6px;margin-top:6px;overflow:hidden">' +
+            '<div style="padding:8px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="toggleRawLetter(\'' + letterKey + '\')">' +
+              '<div style="font-size:12px;color:var(--muted)">' + fmtRawAt(r.at) + (r.project ? ' · ' + r.project : '') + '</div>' +
+              '<span style="color:var(--muted);font-size:11px">' + (isLetterOpen ? '▲' : '▼') + '</span>' +
+            '</div>' +
+            (isLetterOpen ? '<div style="padding:10px 12px;border-top:0.5px solid var(--border);font-size:12px;color:var(--muted);white-space:pre-wrap;line-height:1.7">' + (r.content || '—') + '</div>' : '') +
+            '</div>';
+        }).join('') +
+        '</div>';
+    }
+
+    return '<div style="background:var(--card);border:0.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden">' +
+      '<div style="padding:12px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="toggleRawPerson(' + i + ')">' +
+        '<div style="display:flex;align-items:center">' +
+          '<div>' +
+            '<div style="font-weight:500;margin-bottom:2px">' + name + countBadge + '</div>' +
+            '<div style="font-size:11px;color:var(--hint)">最新：' + lastAt + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<span style="color:var(--muted)">' + (isPersonOpen ? '▲' : '▼') + '</span>' +
+      '</div>' +
+      lettersHTML +
+      '</div>';
+  }).join('');
+}
+
+function fmtRawAt(at) {
+  if (!at) return '';
+  var s = String(at);
+  // ISO 格式 → yyyy-MM-dd HH:mm
+  var m = s.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/);
+  if (m) return m[1] + ' ' + m[2];
+  return s;
+}
+
+function toggleRawPerson(i) {
+  if (!window._rawOpen) window._rawOpen = {};
+  window._rawOpen['p_' + i] = !window._rawOpen['p_' + i];
+  renderRawList();
+}
+
+function toggleRawLetter(key) {
+  if (!window._rawOpen) window._rawOpen = {};
+  window._rawOpen[key] = !window._rawOpen[key];
+  renderRawList();
+}
+
+// =====================================================
+// HR SUMMARY
+// =====================================================
+function summarizeHRReport(reportContent, el) {
+  var recruitSection = '';
+  var idx = reportContent.indexOf('招募');
+  if (idx !== -1) {
+    recruitSection = reportContent.slice(idx, idx + 2000);
+  } else {
+    recruitSection = reportContent.slice(0, 2000);
+  }
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 400,
+      messages: [{
+        role: 'user',
+        content: '以下是 HR 週報的招募段落，請用繁體中文條列式摘要重點（每點 30 字以內，最多 6 點），格式：• 重點內容。不要複製原文，用自己的話總結。\n\n' + recruitSection
+      }]
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    var text = d.content && d.content[0] ? d.content[0].text : '';
+    if (text) {
+      el.innerHTML = text.split('\n').filter(function(l) { return l.trim(); }).map(function(l) {
+        return '<div style="margin-bottom:6px">' + l.trim() + '</div>';
+      }).join('');
+    } else {
+      el.innerHTML = '<span style="color:var(--hint)">摘要產生失敗</span>';
+    }
+  })
+  .catch(function() {
+    el.innerHTML = '<span style="color:var(--hint)">摘要產生失敗，請直接查看原始週報</span>';
+  });
+}
+
+// =====================================================
+// INIT
+// =====================================================
+renderOverview();
+loadLiveData().then(function(loaded) {
+  if (loaded) {
+    renderOverview();
+    if (curPage !== 'overview') {
+      var renders = {
+        suggestions: renderSuggestions,
+        projects: renderProjList,
+        headcount: renderHeadcount,
+        bd: renderBD,
+        tfl: renderTFL,
+        rawreports: renderRaw
+      };
+      if (renders[curPage]) renders[curPage]();
+    }
+  }
+});
+</script>
+</body>
+</html>
